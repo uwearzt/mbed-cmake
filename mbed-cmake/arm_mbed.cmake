@@ -1,0 +1,137 @@
+# ------------------------------------------------------------------------------
+# Copyright by Uwe Arzt mailto:mail@uwe-arzt.de, https://uwe-arzt.de
+# under BSD License, see https://uwe-arzt.de/bsd-license/
+# ------------------------------------------------------------------------------
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.10)
+ 
+# ------------------------------------------------------------------------------
+# git checkout location of mbed libraries
+set(MBED_PATH "/Users/uwe/gitdev/mbed/build")
+# location where the arm toolset is installed
+set(ARM_GCC_PATH "/opt/local/gcc-arm")
+
+# ------------------------------------------------------------------------------
+# custom target for copying to mbed device
+add_custom_target(upload
+  arm-none-eabi-objcopy -O binary ${BIN} ${BIN}.bin
+  COMMAND cp ${BIN}.bin ${MBEDMOUNT}
+)
+
+# ------------------------------------------------------------------------------
+# custom target for opening serial console
+add_custom_target(sercon
+  command screen ${SERCON} 9600
+)
+ 
+# ------------------------------------------------------------------------------
+# setup processor settings
+if(MBED_TARGET MATCHES "LPC1768")
+  set(MBED_PREFIX "LPC17")
+  set(MBED_CORE "cortex-m3")
+  set(MBED_VENDOR "NXP")
+  set(MBED_INSTRUCTIONSET "M3")
+elseif(MBED_TARGET MATCHES "LPC11U24")
+  set(MBED_PREFIX "LPC11")
+  set(MBED_CORE "cortex-m0")
+  set(MBED_VENDOR "NXP")
+  set(MBED_INSTRUCTIONSET "M0")
+elseif(MBED_TARGET MATCHES "LPC11C24")
+  set(MBED_PREFIX "LPC11")
+  set(MBED_CORE "cortex-m0")
+  set(MBED_VENDOR "NXP")
+  set(MBED_INSTRUCTIONSET "M0")
+else()
+   message(FATAL_ERROR "No MBED_TARGET specified or available. Full stop :(")
+endif()
+
+# ------------------------------------------------------------------------------
+# compiler settings
+SET(COMMON_FLAGS "-mcpu=${MBED_CORE} -mthumb -fno-exceptions -msoft-float -ffunction-sections -fdata-sections -g -fno-common -fmessage-length=0")
+
+SET(MBED_DEFINES "${MBED_DEFINES} -DTARGET_${MBED_TARGET}")
+SET(MBED_DEFINES "${MBED_DEFINES} -DTARGET_${MBED_INSTRUCTIONSET}")
+SET(MBED_DEFINES "${MBED_DEFINES} -DTARGET_${MBED_VENDOR}")
+SET(MBED_DEFINES "${MBED_DEFINES} -DTOOLCHAIN_GCC_ARM")
+SET(MBED_DEFINES "${MBED_DEFINES} -DTOOLCHAIN_GCC")
+
+SET(CMAKE_CXX_FLAGS "${COMMON_FLAGS} ${MBED_DEFINES} -std=gnu++0x")
+SET(CMAKE_C_FLAGS "${COMMON_FLAGS} ${MBED_DEFINES} -std=gnu99")
+
+
+# ------------------------------------------------------------------------------
+# setup precompiled mbed files which will be needed for all projects
+set(MBED_OBJECTS
+  ${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/TOOLCHAIN_GCC_ARM/startup_${MBED_PREFIX}xx.o
+  ${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/TOOLCHAIN_GCC_ARM/system_${MBED_PREFIX}xx.o
+  ${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/TOOLCHAIN_GCC_ARM/cmsis_nvic.o
+  ${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/TOOLCHAIN_GCC_ARM/retarget.o
+)
+
+# ------------------------------------------------------------------------------
+# libraries for mbed
+set(MBED_LIBS mbed stdc++ supc++ m c gcc nosys)
+ 
+# ------------------------------------------------------------------------------
+# linker settings
+set(CMAKE_EXE_LINKER_FLAGS "-Wl,--gc-sections -Wl,--wrap,main --specs=nano.specs  -u _printf_float -u _scanf_float")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} \"-T${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/TOOLCHAIN_GCC_ARM/${MBED_TARGET}.ld\" -static")
+
+# ------------------------------------------------------------------------------
+# mbed
+include_directories("${MBED_PATH}/mbed/")
+include_directories("${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/")
+include_directories("${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/TOOLCHAIN_GCC_ARM")
+
+link_directories("${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/TOOLCHAIN_GCC_ARM")
+
+# add networking
+if(${USE_NET} STREQUAL "true")
+  include_directories("${MBED_PATH}/net/eth/")
+  include_directories("${MBED_PATH}/net/eth/EthernetInterface")
+  include_directories("${MBED_PATH}/net/eth/Socket")
+  include_directories("${MBED_PATH}/net/eth/TARGET_${MBED_TARGET}/")
+  include_directories("${MBED_PATH}/net/eth/TARGET_${MBED_TARGET}/TOOLCHAIN_GCC_ARM")
+
+  include_directories("${MBED_PATH}/net/eth/lwip")
+  include_directories("${MBED_PATH}/net/eth/lwip/include")
+  include_directories("${MBED_PATH}/net/eth/lwip/include/ipv4")
+  include_directories("${MBED_PATH}/net/eth/lwip-sys")
+
+  link_directories("${MBED_PATH}/net/eth/TARGET_${MBED_TARGET}/TOOLCHAIN_GCC_ARM")
+  set(MBED_LIBS ${MBED_LIBS} eth)
+
+  # supress lwip warnings with 0x11
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-literal-suffix")
+
+  set(USE_RTOS true)
+endif()
+
+# add rtos
+if(${USE_RTOS} STREQUAL "true")
+  include_directories("${MBED_PATH}/rtos/")
+  include_directories("${MBED_PATH}/rtos/TARGET_${MBED_TARGET}/")
+  include_directories("${MBED_PATH}/rtos/TARGET_${MBED_TARGET}/TOOLCHAIN_GCC_ARM")
+
+  link_directories("${MBED_PATH}/rtos/TARGET_${MBED_TARGET}/TOOLCHAIN_GCC_ARM")
+  set(MBED_LIBS ${MBED_LIBS} rtos rtx)
+endif()
+
+# add usb
+if(${USE_USB} STREQUAL "true")
+  include_directories("${MBED_PATH}/USBDevice/")
+  include_directories("${MBED_PATH}/USBDevice/TARGET_${MBED_TARGET}/")
+  include_directories("${MBED_PATH}/USBDevice/TARGET_${MBED_TARGET}/TOOLCHAIN_GCC_ARM")
+
+  link_directories("${MBED_PATH}/usb/TARGET_${MBED_TARGET}/TOOLCHAIN_GCC_ARM")
+  set(MBED_LIBS ${MBED_LIBS} USBDevice)
+endif()
+
+# add dsp
+if(${USE_DSP} STREQUAL "true")
+  include_directories("${MBED_PATH}/dsp/")
+  include_directories("${MBED_PATH}/dsp/TARGET_${MBED_TARGET}/")
+  include_directories("${MBED_PATH}/dsp/TARGET_${MBED_TARGET}/TOOLCHAIN_GCC_ARM")
+
+  link_directories("${MBED_PATH}/dsp/TARGET_${MBED_TARGET}/TOOLCHAIN_GCC_ARM")
+  set(MBED_LIBS ${MBED_LIBS} cmsis_dsp dsp)
+endif()
