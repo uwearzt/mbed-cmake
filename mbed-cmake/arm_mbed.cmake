@@ -26,17 +26,20 @@ add_custom_target(sercon
 # ------------------------------------------------------------------------------
 # setup processor settings
 if(MBED_TARGET MATCHES "LPC1768")
-  set(MBED_PREFIX "LPC17")
+  set(MBED_STARTUP_PREFIX "LPC17")
+  set(MBED_SYSTEM_PREFIX "LPC17")
   set(MBED_CORE "cortex-m3")
   set(MBED_VENDOR "NXP")
   set(MBED_INSTRUCTIONSET "M3")
 elseif(MBED_TARGET MATCHES "LPC11U24")
-  set(MBED_PREFIX "LPC11")
+  set(MBED_STARTUP_PREFIX "LPC11")
+  set(MBED_SYSTEM_PREFIX "LPC11U")
   set(MBED_CORE "cortex-m0")
   set(MBED_VENDOR "NXP")
   set(MBED_INSTRUCTIONSET "M0")
 elseif(MBED_TARGET MATCHES "LPC11C24")
-  set(MBED_PREFIX "LPC11")
+  set(MBED_STARTUP_PREFIX "LPC11")
+  set(MBED_SYSTEM_PREFIX "LPC11C")
   set(MBED_CORE "cortex-m0")
   set(MBED_VENDOR "NXP")
   set(MBED_INSTRUCTIONSET "M0")
@@ -46,7 +49,7 @@ endif()
 
 # ------------------------------------------------------------------------------
 # compiler settings
-SET(COMMON_FLAGS "-mcpu=${MBED_CORE} -mthumb -fno-exceptions -msoft-float -ffunction-sections -fdata-sections -g -fno-common -fmessage-length=0")
+SET(COMMON_FLAGS "-mcpu=${MBED_CORE} -Os -mthumb -fno-exceptions -msoft-float -ffunction-sections -fdata-sections -g -fno-common -fmessage-length=0")
 
 SET(MBED_DEFINES "${MBED_DEFINES} -DTARGET_${MBED_TARGET}")
 SET(MBED_DEFINES "${MBED_DEFINES} -DTARGET_${MBED_INSTRUCTIONSET}")
@@ -61,8 +64,8 @@ SET(CMAKE_C_FLAGS "${COMMON_FLAGS} ${MBED_DEFINES} -std=gnu99")
 # ------------------------------------------------------------------------------
 # setup precompiled mbed files which will be needed for all projects
 set(MBED_OBJECTS
-  ${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/TOOLCHAIN_GCC_ARM/startup_${MBED_PREFIX}xx.o
-  ${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/TOOLCHAIN_GCC_ARM/system_${MBED_PREFIX}xx.o
+  ${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/TOOLCHAIN_GCC_ARM/startup_${MBED_STARTUP_PREFIX}xx.o
+  ${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/TOOLCHAIN_GCC_ARM/system_${MBED_SYSTEM_PREFIX}xx.o
   ${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/TOOLCHAIN_GCC_ARM/cmsis_nvic.o
   ${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/TOOLCHAIN_GCC_ARM/retarget.o
 )

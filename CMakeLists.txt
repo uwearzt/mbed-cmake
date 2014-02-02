@@ -13,14 +13,16 @@ project (BlinkLed C CXX ASM)
  
 # ------------------------------------------------------------------------------
 # set the target processor and include settings for cmake
-set(MBED_TARGET LPC1768)
+
+#set(MBED_TARGET LPC1768)
+set(MBED_TARGET LPC11U24)
 
 # ------------------------------------------------------------------------------
 # will add the include dirs and link the lib
-set(USE_RTOS true)
-set(USE_NET true)
-set(USE_USB true)
-set(USE_DSP true)
+#set(USE_RTOS true)
+#set(USE_NET true)
+#set(USE_USB true)
+#set(USE_DSP true)
 
 # ------------------------------------------------------------------------------
 # for installing an serial console
