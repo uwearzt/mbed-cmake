@@ -14,8 +14,8 @@ project (BlinkLed C CXX ASM)
 # ------------------------------------------------------------------------------
 # set the target processor and include settings for cmake
 
-#set(MBED_TARGET LPC1768)
-set(MBED_TARGET LPC11U24)
+set(MBED_TARGET LPC1768)
+#set(MBED_TARGET LPC11U24)
 
 # ------------------------------------------------------------------------------
 # will add the include dirs and link the lib
@@ -27,7 +27,7 @@ set(MBED_TARGET LPC11U24)
 # ------------------------------------------------------------------------------
 # for installing an serial console
 set(MBEDMOUNT /Volumes/MBED)
-set(SERCON /dev/tty.usbmodem1422)
+set(SERCON /dev/tty.usbmodem1442)
 
  
 # ------------------------------------------------------------------------------
