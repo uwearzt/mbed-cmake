@@ -72,7 +72,7 @@ set(MBED_OBJECTS
 
 # ------------------------------------------------------------------------------
 # libraries for mbed
-set(MBED_LIBS mbed stdc++ supc++ m c gcc nosys)
+set(MBED_LIBS mbed stdc++ supc++ m gcc g c nosys rdimon)
  
 # ------------------------------------------------------------------------------
 # linker settings
