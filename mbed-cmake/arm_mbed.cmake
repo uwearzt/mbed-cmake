@@ -96,11 +96,6 @@ include_directories("${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/${TOOLCHAIN}")
 include_directories("${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/TARGET_${MBED_VENDOR}/TARGET_${MBED_FAMILY}/")
 include_directories("${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/TARGET_${MBED_VENDOR}/TARGET_${MBED_FAMILY}/TARGET_${MBED_CPU}")
 
-get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-foreach(dir ${dirs})
-  message(STATUS "  ${dir}")
-endforeach()
-
 link_directories("${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/${TOOLCHAIN}")
 
 # add networking
@@ -115,6 +110,7 @@ if(${USE_NET} STREQUAL "true")
   include_directories("${MBED_PATH}/net/eth/lwip/include")
   include_directories("${MBED_PATH}/net/eth/lwip/include/ipv4")
   include_directories("${MBED_PATH}/net/eth/lwip-sys")
+  include_directories("${MBED_PATH}/net/eth/lwip-eth/arch/TARGET_${MBED_VENDOR}")
 
   link_directories("${MBED_PATH}/net/eth/TARGET_${MBED_TARGET}/${TOOLCHAIN}")
   set(MBED_LIBS ${MBED_LIBS} eth)
@@ -154,3 +150,11 @@ if(${USE_DSP} STREQUAL "true")
   link_directories("${MBED_PATH}/dsp/TARGET_${MBED_TARGET}/${TOOLCHAIN}")
   set(MBED_LIBS ${MBED_LIBS} cmsis_dsp dsp)
 endif()
+
+# print all include directories
+get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+message(STATUS "Include Directories")
+foreach(dir ${dirs})
+  message(STATUS "  ${dir}")
+endforeach()
+
