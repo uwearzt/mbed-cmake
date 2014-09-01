@@ -1,0 +1,10 @@
+from os.path import join
+
+# Keil Compiler
+ARM_PATH = "C:/Keil/ARM/ARMCC"
+ARM_BIN = join(ARM_PATH, "bin")
+ARM_LIB    = join(ARM_PATH, "lib")
+ARM_CPPLIB = join(ARM_PATH, "lib", "cpplib")
+ 
+BUILD_OPTIONS = ["debug-info"]
+

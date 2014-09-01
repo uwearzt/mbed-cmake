@@ -16,6 +16,7 @@ project (BlinkLed C CXX ASM)
 
 set(MBED_TARGET LPC1768)
 #set(MBED_TARGET LPC11U24)
+#set(MBED_TARGET RBLAB_NRF51822)
 
 # ------------------------------------------------------------------------------
 # will add the include dirs and link the lib

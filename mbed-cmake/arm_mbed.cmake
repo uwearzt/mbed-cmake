@@ -37,19 +37,34 @@ if(MBED_TARGET MATCHES "LPC1768")
   set(MBED_VENDOR "NXP")
   set(MBED_FAMILY "LPC176X")
   set(MBED_CPU "MBED_LPC1768")
-  set(MBED_STARTUP_PREFIX "LPC17")
-  set(MBED_SYSTEM_PREFIX "LPC17")
   set(MBED_CORE "cortex-m3")
   set(MBED_INSTRUCTIONSET "M3")
+
+  set(MBED_STARTUP "startup_LPC17xx.o")
+  set(MBED_SYSTEM "system_LPC17xx.o")
+  set(MBED_LINK_TARGET ${MBED_TARGET)
 
 elseif(MBED_TARGET MATCHES "LPC11U24")
   set(MBED_VENDOR "NXP")
   set(MBED_FAMILY "LPC11UXX")
   set(MBED_CPU "LPC11U24_401")
-  set(MBED_STARTUP_PREFIX "LPC11")
-  set(MBED_SYSTEM_PREFIX "LPC11U")
   set(MBED_CORE "cortex-m0")
   set(MBED_INSTRUCTIONSET "M0")
+
+  set(MBED_STARTUP "startup_LPC11xx.o")
+  set(MBED_SYSTEM "system_LPC11Uxx.o")
+  set(MBED_LINK_TARGET ${MBED_TARGET)
+
+elseif(MBED_TARGET MATCHES "RBLAB_NRF51822")
+  set(MBED_VENDOR "NORDIC")
+  set(MBED_FAMILY "MCU_NRF51822")
+  set(MBED_CPU "RBLAB_NRF51822")
+  set(MBED_CORE "cortex-m0")
+  set(MBED_INSTRUCTIONSET "M0")
+
+  set(MBED_STARTUP "startup_NRF51822.o")
+  set(MBED_SYSTEM "system_nrf51822.o")
+  set(MBED_LINK_TARGET "NRF51822")
 
 else()
    message(FATAL_ERROR "No MBED_TARGET specified or available. Full stop :(")
@@ -72,8 +87,8 @@ SET(CMAKE_C_FLAGS "${COMMON_FLAGS} ${MBED_DEFINES} -std=gnu99")
 # ------------------------------------------------------------------------------
 # setup precompiled mbed files which will be needed for all projects
 set(MBED_OBJECTS
-  ${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/${TOOLCHAIN}/startup_${MBED_STARTUP_PREFIX}xx.o
-  ${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/${TOOLCHAIN}/system_${MBED_SYSTEM_PREFIX}xx.o
+  ${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/${TOOLCHAIN}/${MBED_STARTUP}
+  ${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/${TOOLCHAIN}/${MBED_SYSTEM}
   ${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/${TOOLCHAIN}/cmsis_nvic.o
   ${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/${TOOLCHAIN}/retarget.o
   ${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/${TOOLCHAIN}/board.o
@@ -86,7 +101,7 @@ set(MBED_LIBS mbed stdc++ supc++ m gcc g c nosys rdimon)
 # ------------------------------------------------------------------------------
 # linker settings
 set(CMAKE_EXE_LINKER_FLAGS "-Wl,--gc-sections -Wl,--wrap,main --specs=nano.specs  -u _printf_float -u _scanf_float")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} \"-T${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/${TOOLCHAIN}/${MBED_TARGET}.ld\" -static")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} \"-T${MBED_PATH}/mbed/TARGET_${MBED_TARGET}/${TOOLCHAIN}/${MBED_LINK_TARGET}.ld\" -static")
 
 # ------------------------------------------------------------------------------
 # mbed
